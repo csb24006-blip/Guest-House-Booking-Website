@@ -18,4 +18,3 @@ A responsive hotel booking website that allows users to view hotels, check avail
 1. Download or clone the repository
 2. Open `work.html` in a browser
 
-   retry
