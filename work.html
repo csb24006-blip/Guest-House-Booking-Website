@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tezpur University Guest House</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: linear-gradient(to bottom right, #eef2ff, #ffffff); padding: 20px; }
+    .container { max-width: 750px; margin: auto; background: white; padding: 20px; border-radius: 14px; box-shadow: 0 0 12px rgba(0,0,0,0.15); }
+    .rooms { display: flex; gap: 12px; }
+    .room { border: 1px solid #ccc; border-radius: 10px; overflow: hidden; width: 33%; background: #fafafa; transition: 0.3s; cursor: pointer; padding-bottom:8px; }
+    .room:hover { transform: scale(1.03); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    .room img { width: 100%; height: 130px; object-fit: cover; }
+    .btn { background: #4f46e5; color: white; padding: 10px; border: none; border-radius: 6px; cursor: pointer; width: 100%; }
+    .btn:hover { background: #3b36c8; }
+    #paymentBox, #receiptBox { padding: 15px; background: #eef; border-radius: 10px; margin-top: 20px; display: none; }
+    #receiptBox { background: #e8ffe8; }
+    input, select { padding: 8px; width: 100%; border: 1px solid #ccc; border-radius: 6px; }
+    header img{ width:120px; height:auto; border-radius:8px; }
+    .muted { color:#666; font-size:0.95rem }
+  </style>
+</head>
+
+<body>
+  <header style="text-align:center; padding:20px;">
+    <img src="https://upload.wikimedia.org/wikipedia/en/c/c8/Tezpur_University_logo.png" alt="Tezpur University Logo" />
+    <h1>Tezpur University Guest House</h1>
+  </header>
+
+  <div class="container">
+    <h3>Available Rooms</h3>
+    <div class="rooms">
+      <div class="room" onclick="selectRoom('Standard')">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvKpV7KQcMc7T4To84fBYVoxYPnVAClOucWA&s" />
+        <p><b>Standard</b> - ₹2000/night</p>
+        <p>👥 Accommodates: <b>2 people</b></p>
+        <p>🏢 Rooms Available: <b id="avail-standard">5</b></p>
+      </div>
+      <div class="room" onclick="selectRoom('Deluxe')">
+        <img src="https://www.jaypeehotels.com/blog/wp-content/uploads/2024/09/Blog-6-scaled.jpg" />
+        <p><b>Deluxe</b> - ₹3500/night</p>
+        <p>👥 Accommodates: <b>3 people</b></p>
+        <p>🏢 Rooms Available: <b id="avail-deluxe">3</b></p>
+      </div>
+      <div class="room" onclick="selectRoom('Suite')">
+        <img src="https://assets.architecturaldigest.in/photos/65b2aecf269da4a0ee6c9b40/master/w_1600%2Cc_limit/atr.royalmansion-bedroom2-mr.jpg" />
+        <p><b>Suite</b> - ₹10000/night</p>
+        <p>👥 Accommodates: <b>5 people</b></p>
+        <p>🏢 Rooms Available: <b id="avail-suite">2</b></p>
+      </div>
+    </div>
+
+    <h3>Book a Room</h3>
+    <label>Your Name:</label>
+    <input id="name" type="text" />
+    <br /><br />
+
+    <label>Room Type:</label>
+    <select id="roomType">
+      <option>Standard</option>
+      <option>Deluxe</option>
+      <option>Suite</option>
+    </select>
+    <br /><br />
+
+    <label>Check-in:</label>
+    <input id="checkIn" type="date" />
+    <br /><br />
+
+    <label>Check-out:</label>
+    <input id="checkOut" type="date" />
+    <br /><br />
+
+    <button class="btn" onclick="showPayment()">Proceed to Booking Confirmation</button>
+
+    <!-- CONFIRMATION / ID UPLOAD -->
+    <div id="paymentBox">
+      <h3>📧 Booking Confirmation Request</h3>
+
+      <label>Upload ID (Student / Professor / Working Professional):</label>
+      <input id="idUpload" type="file" accept="image/*,application/pdf" onchange="previewID()" />
+      <br/><br/>
+      <img id="idPreview" style="display:none; width:120px; border:1px solid #ccc; border-radius:6px; margin-bottom:12px;" />
+
+      <p>Enter your email to receive booking decision within 12 hours:</p>
+      <input type="email" id="confirmationEmail" placeholder="you@example.com" style="padding:6px; width:90%; border:1px solid #999; border-radius:6px;">
+      <br><br>
+
+      <button class="btn" onclick="submitForApproval()">Submit for Approval</button>
+
+      <div id="approvalStatus" style="display:none; margin-top:15px; font-size:15px; background:#f0f0ff; padding:10px; border-radius:6px;"></div>
+    </div>
+
+    <!-- RECEIPT BOX -->
+    <div id="receiptBox">
+      <h3>📄 Booking Receipt</h3>
+      <pre id="receipt" style="white-space:pre-wrap;"></pre>
+      <button class="btn" onclick="downloadReceipt()">Download Receipt</button>
+    </div>
+
+    <p class="muted" style="margin-top:12px">Note: This app simulates booking request flow. For production you'd connect to a backend to queue requests and send emails (SendGrid/SES/etc.).</p>
+  </div>
+
+  <script>
+    // room availability state
+    const availability = { Standard:5, Deluxe:3, Suite:2 };
+    const prices = { Standard:2000, Deluxe:3500, Suite:10000 };
+
+    function selectRoom(type){
+      document.getElementById('roomType').value = type;
+      alert(type + ' room selected!');
+    }
+
+    function showPayment(){
+      const name = document.getElementById('name').value;
+      const checkIn = document.getElementById('checkIn').value;
+      const checkOut = document.getElementById('checkOut').value;
+      if(!name || !checkIn || !checkOut){ alert('Please fill all details.'); return; }
+      document.getElementById('paymentBox').style.display = 'block';
+      document.getElementById('paymentBox').scrollIntoView({behavior:'smooth'});
+    }
+
+    // submit booking request for approval
+    function submitForApproval(){
+      const email = document.getElementById('confirmationEmail').value;
+      const idFile = document.getElementById('idUpload').files[0];
+      const name = document.getElementById('name').value;
+      const room = document.getElementById('roomType').value;
+      const checkIn = document.getElementById('checkIn').value;
+      const checkOut = document.getElementById('checkOut').value;
+
+      if(!email){ alert('Please enter your email.'); return; }
+      if(!idFile){ alert('Please upload a valid ID before submitting.'); return; }
+
+      // build request object
+      const request = {
+        id: 'rq_' + Date.now(),
+        name, room, checkIn, checkOut,
+        email,
+        idFileName: idFile.name,
+        createdAt: Date.now(),
+        status: 'pending' // pending | accepted | rejected
+      };
+
+      // save to localStorage queue (simple persistence)
+      const queue = JSON.parse(localStorage.getItem('bookingQueue') || '[]');
+      queue.push(request);
+      localStorage.setItem('bookingQueue', JSON.stringify(queue));
+
+      // show status to user
+      const status = document.getElementById('approvalStatus');
+      status.style.display = 'block';
+      status.innerHTML = '⏳ Your booking request has been submitted.<br>You will receive an email within <b>12 hours</b> confirming acceptance or rejection.';
+
+      // for demo purposes, also schedule a simulated decision after 10 seconds
+      // (In production remove this and use a backend/email system to decide after 12 hours)
+      setTimeout(() => simulateDecision(request.id), 10000);
+    }
+
+    // Simulate admin decision (demo only). Randomly accept or reject.
+    function simulateDecision(requestId){
+      const queue = JSON.parse(localStorage.getItem('bookingQueue') || '[]');
+      const idx = queue.findIndex(r => r.id === requestId);
+      if(idx === -1) return;
+      // random accept/reject
+      const accepted = Math.random() > 0.3; // 70% accept chance
+      queue[idx].status = accepted ? 'accepted' : 'rejected';
+      queue[idx].decidedAt = Date.now();
+      localStorage.setItem('bookingQueue', JSON.stringify(queue));
+
+      // notify user in-page (in production you'd send an email)
+      const status = document.getElementById('approvalStatus');
+      if(accepted){
+        status.innerHTML = '✅ Your booking has been <b>ACCEPTED</b>. Please proceed to payment (this demo will auto-complete the booking).';
+        // auto-complete booking in demo (decrement availability and show receipt)
+        completeBooking(queue[idx]);
+      } else {
+        status.innerHTML = '❌ Your booking has been <b>REJECTED</b>. You will receive details on the provided email.';
+      }
+    }
+
+    // Complete booking: decrement availability and show receipt (demo auto-payment)
+    function completeBooking(req){
+      if(availability[req.room] <= 0){
+        alert('Sorry, no rooms available of this type at confirmation time.');
+        return;
+      }
+      availability[req.room] -= 1;
+      document.getElementById('avail-' + req.room.toLowerCase()).innerText = availability[req.room];
+
+      const nights = calcNights(req.checkIn, req.checkOut);
+      const total = (prices[req.room] || 0) * nights;
+
+      const receiptText = `Booking Confirmed!\n\nName: ${req.name}\nRoom: ${req.room}\nCheck-in: ${req.checkIn}\nCheck-out: ${req.checkOut}\nNights: ${nights}\nTotal: ₹${total}\nUploaded ID: ${req.idFileName}`;
+
+      document.getElementById('receipt').innerText = receiptText;
+      document.getElementById('paymentBox').style.display = 'none';
+      document.getElementById('receiptBox').style.display = 'block';
+
+      // update queue status in localStorage
+      const queue = JSON.parse(localStorage.getItem('bookingQueue') || '[]');
+      const i = queue.findIndex(r => r.id === req.id);
+      if(i !== -1){ queue[i].status = 'accepted'; queue[i].decidedAt = Date.now(); localStorage.setItem('bookingQueue', JSON.stringify(queue)); }
+    }
+
+    function calcNights(inDate, outDate){
+      try{ const a = new Date(inDate); const b = new Date(outDate); const diff = Math.max(1, Math.ceil((b - a) / (1000*60*60*24))); return diff; }catch(e){ return 1; }
+    }
+
+    function downloadReceipt(){
+      const text = document.getElementById('receipt').innerText;
+      const blob = new Blob([text], { type: 'text/plain' });
+      const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'booking_receipt.txt'; link.click();
+    }
+
+    function previewID(){
+      const file = document.getElementById('idUpload').files[0];
+      if(!file) return; const preview = document.getElementById('idPreview');
+      if(file.type.startsWith('image/')){ preview.src = URL.createObjectURL(file); preview.style.display = 'block'; } else { preview.style.display = 'none'; }
+    }
+
+    // On load: show any pending requests count (helpful for demo/admin)
+    window.addEventListener('load', ()=>{
+      const queue = JSON.parse(localStorage.getItem('bookingQueue') || '[]');
+      const pending = queue.filter(q => q.status === 'pending').length;
+      if(pending > 0){ console.log(`There are ${pending} pending booking requests.`); }
+    });
+  </script>
+</body>
+</html>
