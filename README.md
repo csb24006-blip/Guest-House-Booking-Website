@@ -1,7 +1,7 @@
-# Hotel Booking Website
+# University Guest House Booking Website
 
 ## Description
-A responsive hotel booking website that allows users to view hotels, check availability, and simulate booking functionality.
+A responsive hotel booking website that allows users to view rooms, check availability and simulate booking functionality.
 
 ## Tech Stack
 - HTML
@@ -10,11 +10,9 @@ A responsive hotel booking website that allows users to view hotels, check avail
 
 ## Features
 - Responsive design
-- Hotel listing UI
+- Room listing UI
 - Booking form
-- Clean UI/UX
+- Input ID and email to get booking confirmation
 
-## How to Run
-1. Download or clone the repository
-2. Open `index.html` in a browser
+
 
