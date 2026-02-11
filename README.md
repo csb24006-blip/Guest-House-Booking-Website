@@ -1,5 +1,7 @@
 # University Guest House Booking Website
 
+##Live Working Link :  https://csb24006-blip.github.io/Guest-House-Booking-Website/
+
 ## Description
 A responsive room booking website that allows users to view rooms, check availability and simulate booking functionality.
 
@@ -9,11 +11,11 @@ A responsive room booking website that allows users to view rooms, check availab
 - JavaScript
 
 ## Features
-- Responsive design
+- Takes university ID for verification
+- Input email to get booking confirmation
 - Room listing UI
 - Booking form
-- Input ID and email to get booking confirmation
-- Simulates booking flow by rejecting or accepting booking request
+- Simulates booking flow by rejecting or accepting booking request (in 10 seconds for demo) 
 
 
 
