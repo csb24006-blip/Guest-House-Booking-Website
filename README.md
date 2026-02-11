@@ -1,6 +1,7 @@
 # University Guest House Booking Website
 
-##Live Working Link :  https://csb24006-blip.github.io/Guest-House-Booking-Website/
+## Live Working Link  
+https://csb24006-blip.github.io/Guest-House-Booking-Website/
 
 ## Description
 A responsive room booking website that allows users to view rooms, check availability and simulate booking functionality.
